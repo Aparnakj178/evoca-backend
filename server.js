@@ -5,6 +5,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const PORT = process.env.PORT || 8080; // ✅ Add this line
+
 app.get('/', (req, res) => {
   res.send('Evoca backend running');
 });
