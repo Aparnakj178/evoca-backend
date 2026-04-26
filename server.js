@@ -27,7 +27,7 @@ app.post('/send-sms', async (req, res) => {
       },
       {
         headers: {
-          authorization: 'Hc5fDUBp17iR46xmPXMOGFChNwtsI39vSkVjQZYyJA8ETrnzdbIbKt3drUiBQZ7JLsx0fwNYCH5yqSE8', // ← paste here
+          authorization: process.env.FAST2SMS_API_KEY,
         },
       }
     );
