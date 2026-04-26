@@ -1,27 +1,34 @@
-const express = require('express');
-const cors = require('cors');
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-const PORT = process.env.PORT || 8080; // ✅ Add this line
-
-app.get('/', (req, res) => {
-  res.send('Evoca backend running');
-});
-
 app.post('/send-sms', async (req, res) => {
-  const { phone, name } = req.body;
+  try {
+    const { phone, name, message } = req.body;
 
-  console.log('SMS REQUEST:', { phone, name });
+    if (!phone) {
+      return res.status(400).json({ success: false, error: 'Phone is required' });
+    }
 
-  return res.json({
-    success: true,
-    message: 'SMS API test success',
-  });
-});
+    const smsMessage =
+      message || `Hi ${name || 'Customer'}, your booking is confirmed.`;
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Evoca backend running on port ${PORT}`);
+    const params = new URLSearchParams({
+      authorization: process.env.FAST2SMS_API_KEY,
+      route: 'q',
+      message: smsMessage,
+      numbers: phone,
+    });
+
+    const response = await fetch(`https://www.fast2sms.com/dev/bulkV2?${params.toString()}`, {
+      method: 'GET',
+      headers: { accept: 'application/json' },
+    });
+
+    const data = await response.json();
+
+    return res.json({ success: true, data });
+  } catch (error) {
+    console.log('SMS ERROR:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
 });
