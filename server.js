@@ -1,32 +1,35 @@
 app.post('/send-sms', async (req, res) => {
   try {
-    const { phone, name, message } = req.body;
+    const { phone, message } = req.body;
 
     if (!phone) {
-      return res.status(400).json({ success: false, error: 'Phone is required' });
+      return res.status(400).json({ success: false, error: 'Phone required' });
     }
 
-    const smsMessage =
-      message || `Hi ${name || 'Customer'}, your booking is confirmed.`;
-
-    const params = new URLSearchParams({
-      authorization: process.env.FAST2SMS_API_KEY,
-      route: 'q',
-      message: smsMessage,
-      numbers: phone,
-    });
-
-    const response = await fetch(`https://www.fast2sms.com/dev/bulkV2?${params.toString()}`, {
-      method: 'GET',
-      headers: { accept: 'application/json' },
+    const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
+      method: 'POST',
+      headers: {
+        authorization: process.env.FAST2SMS_API_KEY,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        route: 'q',
+        message: message || 'Test SMS from Evoca',
+        language: 'english',
+        numbers: phone,
+      }),
     });
 
     const data = await response.json();
 
-    return res.json({ success: true, data });
+    res.json({
+      success: true,
+      data,
+    });
+
   } catch (error) {
     console.log('SMS ERROR:', error);
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       error: error.message,
     });
