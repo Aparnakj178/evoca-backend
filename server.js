@@ -1,45 +1,24 @@
+const express = require('express');
+const cors = require('cors');
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.send('Evoca backend running');
+});
+
 app.post('/send-sms', async (req, res) => {
-  try {
-    const { phone, name, message } = req.body;
+  return res.json({
+    success: true,
+    message: 'Fast2SMS route ready',
+  });
+});
 
-    if (!phone) {
-      return res.status(400).json({
-        success: false,
-        error: 'Phone required',
-      });
-    }
+const PORT = process.env.PORT || 8080;
 
-    const smsMessage =
-      message || `Hi ${name || 'Customer'}, your booking is confirmed.`;
-
-    const response = await axios.post(
-      'https://www.fast2sms.com/dev/bulkV2',
-      {
-        route: 'q',
-        message: smsMessage,
-        language: 'english',
-        flash: 0,
-        numbers: phone,
-      },
-      {
-        headers: {
-          authorization: process.env.FAST2SMS_API_KEY,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    return res.json({
-      success: true,
-      data: response.data,
-    });
-
-  } catch (error) {
-    console.log('SMS ERROR:', error.response?.data || error.message);
-
-    return res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Evoca backend running on port ${PORT}`);
 });
