@@ -14,9 +14,7 @@ app.get('/', (req, res) => {
 
 app.post('/send-sms', async (req, res) => {
   const { phone, name } = req.body;
-
   console.log('API KEY EXISTS:', !!process.env.FAST2SMS_API_KEY);
-
   try {
     const response = await axios.get(
       'https://www.fast2sms.com/dev/bulkV2',
@@ -31,10 +29,8 @@ app.post('/send-sms', async (req, res) => {
         }
       }
     );
-
     console.log('SMS SENT:', response.data);
     return res.json({ success: true, data: response.data });
-
   } catch (error) {
     console.error('SMS ERROR:', error.response?.data || error.message);
     return res.status(500).json({ success: false, error: error.message });
